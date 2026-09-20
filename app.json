@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "CampusGuard",
+    "slug": "campusguard",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/slrc-logo.png",
+    "scheme": "campusguard",
+    "backgroundColor": "#F4F4F4",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/expo.icon",
+      "backgroundColor": "#F4F4F4"
+    },
+    "android": {
+      "backgroundColor": "#F4F4F4",
+      "adaptiveIcon": {
+        "backgroundColor": "#F4F4F4"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "@react-native-community/datetimepicker"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
