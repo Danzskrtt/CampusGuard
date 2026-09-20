@@ -1,7 +1,6 @@
 import PersonEditor from '@/features/admin/components/PersonEditor';
 import PersonRow from '@/features/admin/components/PersonRow';
 import ScreenShell from '@/features/admin/components/ScreenShell';
-import TextField from '@/features/admin/components/TextField';
 import { ICON_COLORS, STUDENT_MANAGEMENT_COPY } from '@/constants/admin';
 import { useDebounced } from '@/hooks/useAsync';
 import type { Person } from '@/hooks/useProfiles';
@@ -9,7 +8,7 @@ import { useStudents } from '@/hooks/useProfiles';
 import { useAvatarUrls } from '@/hooks/useAvatarUrls';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 export default function Students() {
   const [search, setSearch] = useState('');
@@ -22,9 +21,20 @@ export default function Students() {
     <ScreenShell title="Student Directory" subtitle="Add, edit, activate or remove student accounts" loading={loading} error={error} onRefresh={refresh}
       right={<Pressable onPress={() => { setEditing(null); setEditorOpen(true); }} style={{ backgroundColor: '#1B2A4A' }} className="rounded-xl px-3.5 py-2.5"><Text className="text-xs font-bold text-white">Add student</Text></Pressable>}>
       <View className="relative">
-        <Feather name="search" size={17} color={ICON_COLORS.idle} style={{ left: 12, position: 'absolute', top: 34, zIndex: 1 }} />
-        <TextField label={STUDENT_MANAGEMENT_COPY.search} value={search} onChangeText={setSearch} placeholder={STUDENT_MANAGEMENT_COPY.searchPlaceholder} autoCapitalize="none" className="pl-10 pr-10" />
-        {search ? <Pressable onPress={() => setSearch('')} accessibilityLabel={STUDENT_MANAGEMENT_COPY.clearSearch} style={{ position: 'absolute', right: 10, top: 30 }}><Feather name="x-circle" size={18} color={ICON_COLORS.idle} /></Pressable> : null}
+        <Text className="text-xs font-semibold text-muted">{STUDENT_MANAGEMENT_COPY.search}</Text>
+        <View className="relative mt-1.5">
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder={STUDENT_MANAGEMENT_COPY.searchPlaceholder}
+            placeholderTextColor={ICON_COLORS.idle}
+            autoCapitalize="none"
+            textAlignVertical="center"
+            className="min-h-11 rounded-xl border border-line bg-white px-3 pl-10 pr-10 text-sm text-ink"
+          />
+          <Feather name="search" size={17} color={ICON_COLORS.idle} style={{ left: 12, position: 'absolute', top: '50%', transform: [{ translateY: -8.5 }] }} />
+          {search ? <Pressable onPress={() => setSearch('')} accessibilityLabel={STUDENT_MANAGEMENT_COPY.clearSearch} style={{ position: 'absolute', right: 10, top: '50%', transform: [{ translateY: -9 }] }}><Feather name="x-circle" size={18} color={ICON_COLORS.idle} /></Pressable> : null}
+        </View>
       </View>
       <Text className="text-xs text-muted">{STUDENT_MANAGEMENT_COPY.resultCount(data?.length ?? 0)}</Text>
       {loading ? <View className="gap-3">

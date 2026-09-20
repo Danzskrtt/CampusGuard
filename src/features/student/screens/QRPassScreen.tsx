@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 14, fontWeight: '600', color: colors.white },
   body: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 16 },
   passWrap: { width: '100%' },
-  footer: { flexDirection: 'row', alignItems: 'center', padding: 16 },
-  footerButton: { flex: 1, minWidth: 0 },
+  footer: { width: '100%', flexDirection: 'row', alignItems: 'center', padding: 16 },
+  footerButton: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0 },
   footerGap: { width: 10 },
 });

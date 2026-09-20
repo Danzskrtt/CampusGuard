@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Chips from './Chips';
-import TextField from './TextField';
 import { VISITOR_TYPES } from '@/constants/admin';
+import { DateField, SelectField, TextField as MobileTextField } from '@/features/student/components/FormFields';
+import { PURPOSES, TIME_WINDOWS } from '@/features/student/data/options';
 import { isoDay } from '@/utils/dates';
 
 export type PassInput = { visitor_name: string; visitor_type: string; company: string; host_name: string; visit_date: string; valid_until: string; time_window: string; purpose: string };
@@ -28,16 +29,14 @@ export default function PassForm({ onSubmit }: { onSubmit: (v: PassInput) => Pro
 
   return (
     <View className="gap-3 rounded-2xl border border-line bg-white p-4">
-      <TextField label="Visitor name" value={v.visitor_name} onChangeText={set('visitor_name')} autoCapitalize="words" />
+      <MobileTextField label="Visitor name" value={v.visitor_name} onChangeText={set('visitor_name')} autoCapitalize="words" />
       <Chips options={types} value={v.visitor_type} onChange={set('visitor_type')} />
-      <TextField label="Company (optional)" value={v.company} onChangeText={set('company')} />
-      <TextField label="Person or office being visited" value={v.host_name} onChangeText={set('host_name')} />
-      <View className="flex-row gap-3">
-        <View className="flex-1"><TextField label="Visit date" value={v.visit_date} onChangeText={set('visit_date')} placeholder="YYYY-MM-DD" autoCapitalize="none" /></View>
-        <View className="flex-1"><TextField label="Valid until" value={v.valid_until} onChangeText={set('valid_until')} placeholder="YYYY-MM-DD" autoCapitalize="none" /></View>
-      </View>
-      <TextField label="Time window" value={v.time_window} onChangeText={set('time_window')} />
-      <TextField label="Purpose" value={v.purpose} onChangeText={set('purpose')} multiline />
+      <MobileTextField label="Company (optional)" value={v.company} onChangeText={set('company')} />
+      <MobileTextField label="Person or office being visited" value={v.host_name} onChangeText={set('host_name')} />
+      <DateField label="Visit date" value={v.visit_date} onChange={(visit_date) => setV((p) => ({ ...p, visit_date }))} />
+      <DateField label="Valid until (optional)" value={v.valid_until} onChange={(valid_until) => setV((p) => ({ ...p, valid_until }))} />
+      <SelectField label="Time window" value={v.time_window} options={TIME_WINDOWS} placeholder="Select time window" onSelect={(time_window) => setV((p) => ({ ...p, time_window }))} />
+      <SelectField label="Purpose" value={v.purpose} options={PURPOSES} placeholder="Select purpose" onSelect={(purpose) => setV((p) => ({ ...p, purpose }))} />
       {err ? <Text className="text-xs text-bad">{err}</Text> : null}
       <Pressable disabled={busy} onPress={submit} accessibilityRole="button" className={`h-11 items-center justify-center rounded-xl bg-navy ${busy ? 'opacity-50' : ''}`}>
         <Text className="text-sm font-bold text-white">Issue pass</Text>
