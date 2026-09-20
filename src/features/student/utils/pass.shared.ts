@@ -1,4 +1,5 @@
 import { Alert, Linking, Share } from 'react-native';
+import { SEPARATOR } from '@/constants/ui';
 import { VisitorRequest } from '@/features/student/types';
 import { formatLongDate } from '@/features/student/utils/date';
 
@@ -14,7 +15,7 @@ function passSummary(request: VisitorRequest): string {
   return [
     `CampusGuard visitor pass for ${request.visitorName}`,
     `Pass ID: ${request.passId}`,
-    `Valid: ${formatLongDate(request.visitDate)} Â· ${request.timeWindow}`,
+    `Valid: ${formatLongDate(request.visitDate)} ${SEPARATOR} ${request.timeWindow}`,
     `Purpose: ${request.purpose}`,
   ].join('\n');
 }

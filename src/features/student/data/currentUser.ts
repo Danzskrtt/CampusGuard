@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 export type CurrentUser = {
   name: string;
   studentId: string;
+  avatarPath: string | null;
 };
 
-const emptyUser: CurrentUser = { name: '', studentId: '' };
+const emptyUser: CurrentUser = { name: '', studentId: '', avatarPath: null };
 
 export function useCurrentUser(): CurrentUser {
   const [user, setUser] = useState<CurrentUser>(emptyUser);
@@ -19,11 +20,19 @@ export function useCurrentUser(): CurrentUser {
       const authUser = authData.user;
       if (!authUser) return;
 
-      const { data: profile } = await supabase
+      let { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('full_name, student_id, avatar_path')
         .eq('id', authUser.id)
         .maybeSingle();
+      if (profileError?.message.toLowerCase().includes('avatar_path')) {
+        const fallback = await supabase
+          .from('profiles')
+          .select('full_name, student_id')
+          .eq('id', authUser.id)
+          .maybeSingle();
+        profile = fallback.data ? { ...fallback.data, avatar_path: null } : null;
+      }
 
       const metadata = authUser.user_metadata as Record<string, unknown> | undefined;
       const profileData = profile as Record<string, unknown> | null;
@@ -37,7 +46,8 @@ export function useCurrentUser(): CurrentUser {
       );
       const studentId = String(profileData?.student_id ?? metadata?.student_id ?? '');
 
-      if (active) setUser({ name, studentId });
+      const avatarPath = profileData?.avatar_path ? String(profileData.avatar_path) : null;
+      if (active) setUser({ name, studentId, avatarPath });
     };
 
     void loadUser();

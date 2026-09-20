@@ -1,4 +1,5 @@
 import type { Tone } from '@/constants/admin';
+import { RANGE_DASH } from '@/constants/ui';
 import { StyleSheet, Text, View } from 'react-native';
 import StatusPill from './StatusPill';
 
@@ -9,7 +10,7 @@ export default function StatCard({ label, value, tone, tag }: Props) {
     <View style={styles.card}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.valueRow}>
-        <Text style={styles.value}>{value ?? 'â€“'}</Text>
+        <Text style={styles.value}>{value ?? RANGE_DASH}</Text>
         {tag && value ? <StatusPill label={tag} tone={tone} /> : null}
       </View>
     </View>

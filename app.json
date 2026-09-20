@@ -26,7 +26,14 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow CampusGuard to choose profile photos.",
+          "cameraPermission": "Allow CampusGuard to take profile photos."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

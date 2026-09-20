@@ -1,11 +1,14 @@
+import { ADMIN_PASS_COPY, ICON_COLORS, PASS_STATUS_TONES, REQUEST_STATUS_LABELS } from '@/constants/admin';
+import { UI_ICONS } from '@/constants/ui';
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import PassForm from '@/features/admin/components/PassForm';
 import PassQrModal from '@/features/admin/components/PassQrModal';
 import ScreenShell from '@/features/admin/components/ScreenShell';
 import StatusPill from '@/features/admin/components/StatusPill';
 import { usePasses, type Pass } from '@/hooks/usePasses';
-import { fmtDate } from '@/utils/dates';
+import { formatPassSchedule } from '@/utils/dates';
 
 export default function Passes() {
   const { data, loading, error, refresh, issue } = usePasses();
@@ -13,21 +16,33 @@ export default function Passes() {
   const [shown, setShown] = useState<Pass | null>(null);
   return (
     <>
-      <ScreenShell title="Admin-Initiated Passes" subtitle="Passes for contractors, officials and other school visitors" loading={loading} error={error} onRefresh={refresh}
-        right={<Pressable onPress={() => setFormOpen(!formOpen)} accessibilityRole="button" style={{ backgroundColor: '#1B2A4A' }} className="rounded-xl px-3.5 py-2.5"><Text className="text-xs font-bold text-white">{formOpen ? 'Close' : 'Issue pass'}</Text></Pressable>}>
+      <ScreenShell title={ADMIN_PASS_COPY.title} subtitle={ADMIN_PASS_COPY.subtitle} loading={loading} error={error} onRefresh={refresh}
+        right={<Pressable onPress={() => setFormOpen(!formOpen)} accessibilityRole="button"><View className="rounded-xl bg-navy px-3.5 py-2.5"><Text className="text-xs font-bold text-white">{formOpen ? ADMIN_PASS_COPY.close : ADMIN_PASS_COPY.issue}</Text></View></Pressable>}>
         {formOpen ? <PassForm onSubmit={async (v) => { await issue(v); setFormOpen(false); }} /> : null}
         {(data ?? []).map((p) => (
-          <Pressable key={p.id} onPress={() => setShown(p)} accessibilityRole="button" className="gap-1 rounded-2xl border border-line bg-white p-4">
-            <View className="flex-row items-center justify-between gap-3">
-              <Text className="flex-1 text-base font-bold text-ink">{p.visitor_name}</Text>
-              <StatusPill label={p.status} tone="ok" />
+          <Pressable key={p.id} onPress={() => setShown(p)} accessibilityRole="button">
+            <View className="rounded-2xl border border-line bg-white p-4">
+              <View className="flex-row items-start gap-3">
+                <View className="h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sky-50">
+                  <Ionicons name={UI_ICONS.qrCode} size={30} color={ICON_COLORS.idle} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-bold text-ink" numberOfLines={1}>{ADMIN_PASS_COPY.visitorPass}</Text>
+                  <Text className="text-sm text-muted" numberOfLines={1}>{p.company || p.visitor_type}</Text>
+                  <Text className="text-sm text-muted" numberOfLines={1}>{`${ADMIN_PASS_COPY.visiting} ${p.host_name || p.visitor_name}`}</Text>
+                  <Text className="text-sm font-semibold text-navy" numberOfLines={1}>{p.pass_id}</Text>
+                </View>
+                <StatusPill label={REQUEST_STATUS_LABELS[p.status] ?? p.status} tone={PASS_STATUS_TONES[p.status] ?? 'neutral'} />
+              </View>
+              <View className="mt-3 flex-row items-center border-t border-slate-100 pt-3">
+                <Text className="flex-1 text-sm font-medium text-navy" numberOfLines={1}>{formatPassSchedule(p.visit_date, p.valid_until, p.time_window)}</Text>
+                <Text className="ml-3 text-sm font-semibold text-navy" numberOfLines={1}>{ADMIN_PASS_COPY.tapToShow}</Text>
+                <Ionicons name={UI_ICONS.chevronForward} size={18} color={ICON_COLORS.muted} />
+              </View>
             </View>
-            <Text className="text-xs text-muted">{[p.company, p.host_name && `Visiting ${p.host_name}`].filter(Boolean).join(' Â· ') || p.visitor_type}</Text>
-            <Text className="text-xs text-muted">{fmtDate(p.visit_date)}{p.valid_until ? ` â€“ ${fmtDate(p.valid_until)}` : ''} Â· {p.time_window}</Text>
-            <Text className="text-xs font-semibold text-navy">{p.pass_id} Â· Tap to show QR</Text>
           </Pressable>
         ))}
-        {data && !data.length ? <Text className="py-10 text-center text-sm text-muted">No admin-issued passes yet.</Text> : null}
+        {data && !data.length ? <Text className="py-10 text-center text-sm text-muted">{ADMIN_PASS_COPY.empty}</Text> : null}
       </ScreenShell>
       <PassQrModal pass={shown} onClose={() => setShown(null)} />
     </>

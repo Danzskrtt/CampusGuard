@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 import StatusPill from './StatusPill';
 import { LOG_STATUS } from '@/constants/admin';
+import { SEPARATOR } from '@/constants/ui';
 import type { FeedItem } from '@/hooks/useAdminDashboard';
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -11,7 +12,7 @@ export default function ActivityFeed({ items }: { items: FeedItem[] }) {
     <View>
       {items.map((it, i) => {
         const s = LOG_STATUS[it.result === 'denied' ? 'denied' : it.action];
-        const sub = [it.guard_name, it.result === 'denied' ? it.deny_reason : null].filter(Boolean).join(' Â· ');
+        const sub = [it.guard_name, it.result === 'denied' ? it.deny_reason : null].filter(Boolean).join(` ${SEPARATOR} `);
         return (
           <View key={it.id} className={`flex-row items-center gap-3 py-3 ${i ? 'border-t border-line' : ''}`}>
             <Text className="w-16 text-xs text-muted">{time(it.scanned_at)}</Text>

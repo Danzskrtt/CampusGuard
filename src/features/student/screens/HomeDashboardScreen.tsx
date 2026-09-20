@@ -1,7 +1,4 @@
-import { Feather } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Avatar from '@/components/ui/Avatar';
 import AppButton from '@/features/student/components/AppButton';
 import ProfileMenu from '@/features/student/components/ProfileMenu';
 import RequestCard from '@/features/student/components/RequestCard';
@@ -9,6 +6,13 @@ import StatCard from '@/features/student/components/StatCard';
 import { useRequests } from '@/features/student/context/RequestsContext';
 import { getInitials, useCurrentUser } from '@/features/student/data/currentUser';
 import { colors } from '@/features/student/theme';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useAvatarUrls } from '@/hooks/useAvatarUrls';
+import { fmtDateTime } from '@/utils/dates';
+import { Feather } from '@expo/vector-icons';
+import { useMemo, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = {
   navigation: { navigate: (name: string, params?: any) => void; goBack: () => void };
@@ -19,7 +23,10 @@ type Props = {
 export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
   const { requests, requestsRefreshing, refreshRequests } = useRequests();
   const currentUser = useCurrentUser();
+  const { urls: avatarUrls } = useAvatarUrls([currentUser.avatarPath]);
+  const { data: notifications = [] } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
+  const notificationList = notifications ?? [];
 
   const counts = useMemo(
     () => ({
@@ -30,13 +37,16 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
     [requests],
   );
 
+  const latestAnnouncement = useMemo(
+    () => notificationList.find((n) => n.type === 'announcement' || n.type === 'system') ?? null,
+    [notificationList],
+  );
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Pressable style={styles.profile} onPress={() => setMenuOpen(true)}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{getInitials(currentUser.name)}</Text>
-          </View>
+          <Avatar uri={avatarUrls[currentUser.avatarPath ?? '']} name={currentUser.name || 'Student'} size="sm" />
           <Text style={styles.userName}>{currentUser.name || 'Student'}</Text>
         </Pressable>
         <Pressable hitSlop={10} style={styles.bell} onPress={() => navigation.navigate('Notifications')} accessibilityLabel="Open notifications">
@@ -46,6 +56,7 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
 
       <ScrollView
         contentContainerStyle={styles.content}
+        className="flex-col"
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={requestsRefreshing} onRefresh={refreshRequests} tintColor={colors.navy} />}
       >
@@ -65,6 +76,22 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
           style={styles.newButton}
         />
 
+        {latestAnnouncement ? (
+          <View style={styles.announcementCard}>
+            <View style={styles.announcementHeader}>
+              <View style={styles.announcementIconWrap}>
+                <Feather name="alert-circle" size={14} color={colors.navy} />
+              </View>
+              <View style={styles.announcementMeta}>
+                <Text style={styles.announcementLabel}>Campus Notice</Text>
+                <Text style={styles.announcementDate}>{fmtDateTime(latestAnnouncement.created_at)}</Text>
+              </View>
+            </View>
+            <Text style={styles.announcementTitle}>{latestAnnouncement.title}</Text>
+            {latestAnnouncement.body ? <Text style={styles.announcementBody}>{latestAnnouncement.body}</Text> : null}
+          </View>
+        ) : null}
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Requests</Text>
           <Pressable onPress={() => navigation.navigate('MyRequests')} hitSlop={8}>
@@ -72,13 +99,15 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
           </Pressable>
         </View>
 
-        {requests.slice(0, 3).map((request) => (
-          <RequestCard
-            key={request.id}
-            request={request}
-            onPress={() => navigation.navigate('RequestDetail', { requestId: request.id })}
-          />
-        ))}
+        <View className="flex-col gap-3 md:flex-row md:flex-wrap">
+          {requests.slice(0, 3).map((request) => (
+            <RequestCard
+              key={request.id}
+              request={request}
+              onPress={() => navigation.navigate('RequestDetail', { requestId: request.id })}
+            />
+          ))}
+        </View>
         {requests.length === 0 && <Text style={styles.empty}>No requests yet. Create a new visitor request to get started.</Text>}
       </ScrollView>
 
@@ -125,11 +154,33 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', marginTop: 4, marginBottom: 16 },
   gap: { width: 10 },
   newButton: { marginTop: 0 },
+  announcementCard: {
+    backgroundColor: '#EEF6FF',
+    borderColor: '#CFE2F7',
+    borderRadius: 16,
+    borderWidth: 1,
+    marginTop: 14,
+    padding: 14,
+  },
+  announcementHeader: { alignItems: 'center', flexDirection: 'row' },
+  announcementIconWrap: {
+    alignItems: 'center',
+    backgroundColor: '#DDECFB',
+    borderRadius: 10,
+    height: 28,
+    justifyContent: 'center',
+    width: 28,
+  },
+  announcementMeta: { flex: 1, marginLeft: 10 },
+  announcementLabel: { color: colors.navy, fontSize: 10, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
+  announcementDate: { color: colors.textSecondary, fontSize: 10, marginTop: 2 },
+  announcementTitle: { color: colors.textPrimary, fontSize: 14, fontWeight: '700', marginTop: 10 },
+  announcementBody: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: 4 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 22,
+    marginTop: 26,
     marginBottom: 10,
   },
   sectionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },

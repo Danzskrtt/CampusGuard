@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import RequestCard from '@/features/student/components/RequestCard';
 import ScreenHeader from '@/features/student/components/ScreenHeader';
 import { useRequests } from '@/features/student/context/RequestsContext';
 import { colors } from '@/features/student/theme';
 import { FilterKey } from '@/features/student/types';
+import { useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = {
   navigation: { navigate: (name: string, params?: any) => void; goBack: () => void };
@@ -51,6 +51,7 @@ export default function MyRequestsScreen({ navigation, route }: Props) {
 
       <ScrollView
         contentContainerStyle={styles.list}
+        className="flex-col gap-3 md:flex-row md:flex-wrap"
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={requestsRefreshing} onRefresh={refreshRequests} tintColor={colors.navy} />}
       >

@@ -1,4 +1,5 @@
 import { Feather } from '@expo/vector-icons';
+import { SEPARATOR } from '@/constants/ui';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { getShortName, useCurrentUser } from '@/features/student/data/currentUser';
@@ -22,7 +23,7 @@ export default function PassCard({ request }: { request: VisitorRequest }) {
 
       <Text style={styles.name}>{request.visitorName}</Text>
       <Text style={styles.sub}>
-        {request.relationship} Â· Invited by {getShortName(currentUser.name)}
+        {request.relationship} {SEPARATOR} Invited by {getShortName(currentUser.name)}
       </Text>
 
       <View style={styles.qrWrap}>
@@ -39,7 +40,7 @@ export default function PassCard({ request }: { request: VisitorRequest }) {
 
       <Text style={styles.passId}>Pass ID: {request.passId}</Text>
       <Text style={styles.meta}>
-        Valid: {formatLongDate(request.visitDate)} Â· {request.timeWindow}
+        Valid: {formatLongDate(request.visitDate)} {SEPARATOR} {request.timeWindow}
       </Text>
       <Text style={styles.meta}>Purpose: {request.purpose}</Text>
 

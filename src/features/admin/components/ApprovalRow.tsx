@@ -1,5 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 import type { PendingRequest } from '@/hooks/useApprovals';
+import { SEPARATOR } from '@/constants/ui';
 
 type Props = { item: PendingRequest; busy: boolean; onApprove: (id: string) => void; onReject: (item: PendingRequest) => void };
 
@@ -7,13 +8,13 @@ const fmt = (d: string) => new Date(`${d}T00:00`).toLocaleDateString(undefined, 
 
 // Stacked card on phones; single row on iPad (md:)
 export default function ApprovalRow({ item, busy, onApprove, onReject }: Props) {
-  const meta = [item.relationship, item.requester?.full_name && `Requested by ${item.requester.full_name}`].filter(Boolean).join(' Â· ');
+  const meta = [item.relationship, item.requester?.full_name && `Requested by ${item.requester.full_name}`].filter(Boolean).join(` ${SEPARATOR} `);
   return (
     <View className="gap-3 rounded-2xl border border-line bg-white p-4 md:flex-row md:items-center">
       <View className="flex-1 gap-0.5">
         <Text className="text-base font-bold text-ink">{item.visitor_name}</Text>
         {meta ? <Text className="text-xs text-muted">{meta}</Text> : null}
-        <Text className="text-xs text-muted">{fmt(item.visit_date)} Â· {item.time_window}</Text>
+        <Text className="text-xs text-muted">{fmt(item.visit_date)} {SEPARATOR} {item.time_window}</Text>
         <Text className="text-xs text-muted">{item.purpose}</Text>
       </View>
       <View className="flex-row gap-2 md:w-64">

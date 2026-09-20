@@ -1,19 +1,20 @@
-import { ADMIN_NAV, ICON_COLORS } from '@/constants/admin';
+import { ADMIN_NAV, ICON_COLORS, MOBILE_PHONE_TAB_KEYS } from '@/constants/admin';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Feather } from '@expo/vector-icons';
-import { GlassView } from 'expo-glass-effect';
 import { useRouter, useSegments, type Href } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MobileTabBar() {
   const router = useRouter();
   const active = useSegments()[1] ?? null;
   const insets = useSafeAreaInsets();
+  const { isTablet } = useResponsive();
+  const tabs = ADMIN_NAV.filter((item) => isTablet ? item.primary : MOBILE_PHONE_TAB_KEYS.includes(item.key as typeof MOBILE_PHONE_TAB_KEYS[number]));
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      <GlassView style={styles.glass} glassEffectStyle="regular" tintColor="#FFFFFF" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
-        {ADMIN_NAV.filter((i) => i.primary || i.segment === 'passes').map((i) => {
+    <View style={[styles.bar, { paddingBottom: insets.bottom }] }>
+      <View style={styles.tabs}>
+        {tabs.map((i) => {
           const on = i.segment === active;
           return (
               <Pressable key={i.key} accessibilityRole="tab" accessibilityState={{ selected: on }} style={styles.tab}
@@ -25,27 +26,23 @@ export default function MobileTabBar() {
             </Pressable>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   bar: {
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: '#FFFFFF',
     borderTopColor: '#E2E8F0',
     borderTopWidth: StyleSheet.hairlineWidth,
-    minHeight: 72,
-    paddingHorizontal: 4,
-    paddingTop: 7,
     boxShadow: '0px -3px 10px rgba(15, 23, 42, 0.06)',
   },
-  glass: { ...StyleSheet.absoluteFill, borderTopLeftRadius: 24, borderTopRightRadius: 24 },
-  tabs: { alignItems: 'flex-start', flexDirection: 'row', gap: 4, paddingHorizontal: 4 },
-  tab: { alignItems: 'center', minWidth: 68, paddingHorizontal: 4 },
-  iconWrap: { alignItems: 'center', borderRadius: 12, height: 34, justifyContent: 'center', width: 44 },
+  tabs: { alignItems: 'stretch', flexDirection: 'row', paddingTop: 8, width: '100%' },
+  tab: { alignItems: 'center', flex: 1, minWidth: 0, paddingHorizontal: 2 },
+  iconWrap: { alignItems: 'center', backgroundColor: 'transparent', borderRadius: 999, height: 32, justifyContent: 'center', width: 44 },
   iconWrapActive: { backgroundColor: '#E8F3F7' },
-  label: { fontSize: 9, marginTop: 3, maxWidth: 58 },
+  label: { fontSize: 10, marginTop: 4, maxWidth: '100%' },
   labelActive: { color: '#1B2A4A', fontWeight: '800' },
   labelIdle: { color: '#64748B', fontWeight: '600' },
 });

@@ -5,6 +5,7 @@ import ScreenShell from '@/features/admin/components/ScreenShell';
 import StatusPill from '@/features/admin/components/StatusPill';
 import TextField from '@/features/admin/components/TextField';
 import { LOG_STATUS, RANGES } from '@/constants/admin';
+import { SEPARATOR } from '@/constants/ui';
 import { useDebounced } from '@/hooks/useAsync';
 import { useVisitorLog } from '@/hooks/useVisitorLog';
 import { fmtDateTime } from '@/utils/dates';
@@ -20,7 +21,7 @@ export default function VisitorLog() {
       <Chips options={RANGES} value={range} onChange={setRange} />
       {rows.map((r) => {
         const s = LOG_STATUS[r.result === 'denied' ? 'denied' : r.action];
-        const sub = [r.pass_id, r.guard_name].filter(Boolean).join(' Â· ');
+        const sub = [r.pass_id, r.guard_name].filter(Boolean).join(` ${SEPARATOR} `);
         return (
           <View key={r.id} className="gap-1 rounded-2xl border border-line bg-white p-4 md:flex-row md:items-center md:gap-4">
             <View className="flex-1">

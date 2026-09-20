@@ -1,4 +1,5 @@
 import PersonEditor from '@/features/admin/components/PersonEditor';
+import { RANGE_DASH } from '@/constants/ui';
 import PersonRow from '@/features/admin/components/PersonRow';
 import ScreenShell from '@/features/admin/components/ScreenShell';
 import type { Person } from '@/hooks/useProfiles';
@@ -22,7 +23,7 @@ export default function Guards() {
           onToggle={(v) => setActive(g.id, v).catch((e: Error) => Alert.alert('Could not update', e.message))}>
           {g.shifts.filter((s) => s.is_active).sort((a, b) => a.day_of_week - b.day_of_week).map((s) => (
             <Text key={s.id} className="text-xs text-muted">
-              {weekday(s.day_of_week)} {fmtTime(s.start_time)} â€“ {fmtTime(s.end_time)}
+              {weekday(s.day_of_week)} {fmtTime(s.start_time)} {RANGE_DASH} {fmtTime(s.end_time)}
             </Text>
           ))}
         </PersonRow>
