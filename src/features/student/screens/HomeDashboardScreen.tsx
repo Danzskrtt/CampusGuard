@@ -1,4 +1,5 @@
 import Avatar from '@/components/ui/Avatar';
+import PasswordChangeModal from '@/components/PasswordChangeModal';
 import AppButton from '@/features/student/components/AppButton';
 import ProfileMenu from '@/features/student/components/ProfileMenu';
 import RequestCard from '@/features/student/components/RequestCard';
@@ -8,6 +9,7 @@ import { getInitials, useCurrentUser } from '@/features/student/data/currentUser
 import { colors } from '@/features/student/theme';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAvatarUrls } from '@/hooks/useAvatarUrls';
+import { updateCurrentUserPassword } from '@/lib/passwordManagement';
 import { fmtDateTime } from '@/utils/dates';
 import { Feather } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
@@ -26,6 +28,7 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
   const { urls: avatarUrls } = useAvatarUrls([currentUser.avatarPath]);
   const { data: notifications = [] } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const notificationList = notifications ?? [];
 
   const counts = useMemo(
@@ -117,6 +120,15 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
         studentId={currentUser.studentId}
         onClose={() => setMenuOpen(false)}
         onLogout={onLogout}
+        onPasswordChange={() => setPasswordModalOpen(true)}
+      />
+      <PasswordChangeModal
+        visible={passwordModalOpen}
+        title="Change your password"
+        subtitle="Use a new password for your student account."
+        submitLabel="Update password"
+        onClose={() => setPasswordModalOpen(false)}
+        onSubmit={(password) => updateCurrentUserPassword(password)}
       />
     </SafeAreaView>
   );

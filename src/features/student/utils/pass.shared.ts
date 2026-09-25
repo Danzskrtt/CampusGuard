@@ -1,17 +1,25 @@
-import { Alert, Linking, Share } from 'react-native';
 import { SEPARATOR } from '@/constants/ui';
 import { VisitorRequest } from '@/features/student/types';
 import { formatLongDate } from '@/features/student/utils/date';
+import type { RefObject } from 'react';
+import type { View } from 'react-native';
+import { Alert, Linking, Share } from 'react-native';
+
+const PASS_QR_PREFIX = 'campusguard://pass/';
 
 export function generatePassId(): string {
   return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
 export function passQrValue(request: VisitorRequest): string {
-  return `campusguard://pass/${request.qrToken ?? request.passId ?? ''}`;
+  return `${PASS_QR_PREFIX}${request.qrToken ?? request.passId ?? ''}`;
 }
 
-function passSummary(request: VisitorRequest): string {
+export function extractPassQrToken(value: string): string {
+  return value.startsWith(PASS_QR_PREFIX) ? value.slice(PASS_QR_PREFIX.length) : value.trim();
+}
+
+export function passSummary(request: VisitorRequest): string {
   return [
     `CampusGuard visitor pass for ${request.visitorName}`,
     `Pass ID: ${request.passId}`,
@@ -20,7 +28,7 @@ function passSummary(request: VisitorRequest): string {
   ].join('\n');
 }
 
-export async function sharePass(request: VisitorRequest) {
+export async function sharePass(request: VisitorRequest, _ref?: RefObject<View | null>) {
   try {
     await Share.share({ message: passSummary(request) });
   } catch {

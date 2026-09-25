@@ -1,8 +1,9 @@
 import { supabase } from '@/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -19,6 +20,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type UserRole = 'student' | 'guard' | 'admin';
+const REMEMBERED_EMAIL_KEY = 'campusguard-remembered-email';
 
 export default function LoginScreen() {
   const palette = {
@@ -35,10 +37,20 @@ export default function LoginScreen() {
   // State for Email/Password Login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    void AsyncStorage.getItem(REMEMBERED_EMAIL_KEY).then((savedEmail) => {
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    }).catch(() => undefined);
+  }, []);
 
   const routeFromSession = async (session: { user: { id: string } }) => {
     const { data } = await supabase
@@ -86,6 +98,12 @@ export default function LoginScreen() {
       const session = data?.session;
       if (!session) {
         throw new Error('Sign in succeeded but no session was returned.');
+      }
+
+      if (rememberMe) {
+        await AsyncStorage.setItem(REMEMBERED_EMAIL_KEY, trimmedEmail);
+      } else {
+        await AsyncStorage.removeItem(REMEMBERED_EMAIL_KEY);
       }
 
       await routeFromSession(session);
@@ -188,6 +206,16 @@ export default function LoginScreen() {
               />
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            onPress={() => setRememberMe((value) => !value)}
+            style={styles.rememberRow}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rememberMe }}
+          >
+            <Ionicons name={rememberMe ? 'checkbox' : 'square-outline'} size={21} color={palette.text} />
+            <Text style={[styles.rememberText, { color: palette.mutedText }]}>Remember me</Text>
+          </TouchableOpacity>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -297,6 +325,17 @@ const styles = StyleSheet.create({
   },
   eyeIconContainer: {
     padding: 14,
+  },
+  rememberRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+    paddingVertical: 4,
+  },
+  rememberText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   primaryButton: {
     width: '100%',

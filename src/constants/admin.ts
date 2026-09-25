@@ -5,7 +5,7 @@ export type Tone = 'neutral' | 'ok' | 'warn' | 'bad';
 export type IconName = ComponentProps<typeof Feather>['name'];
 
 // Supabase names live here so a schema change is a one-line edit.
-export const T = { profiles: 'profiles', requests: 'visitor_requests', logs: 'entry_logs', shifts: 'guard_shifts', notifications: 'notifications' } as const;
+export const T = { profiles: 'profiles', requests: 'visitor_requests', logs: 'entry_logs', shifts: 'guard_shifts', notifications: 'notifications', messages: 'messages' } as const;
 export const RPC = { dashboard: 'get_dashboard_summary', visitorLog: 'get_visitor_log', dailyStats: 'get_daily_stats', peakHours: 'get_peak_hours', purposes: 'get_purpose_breakdown', announce: 'send_announcement' } as const;
 
 export const ADMIN_ROLE = 'admin';
@@ -24,9 +24,10 @@ export const ADMIN_NAV: { key: string; label: string; short?: string; primary?: 
   { key: 'visitor-log', label: 'Visitor Log', short: 'Log', primary: true, segment: 'visitor-log', icon: 'list' },
   { key: 'analytics', label: 'Analytics', short: 'Insights', primary: true, segment: 'analytics', icon: 'bar-chart-2' },
   { key: 'guards', label: 'Guard Management', segment: 'guards', icon: 'shield' },
-  { key: 'students', label: 'Students', segment: 'students', icon: 'users' },
+  { key: 'students', label: 'Student Management', segment: 'students', icon: 'users' },
   { key: 'passes', label: 'Visitor Passes', segment: 'passes', icon: 'credit-card' },
   { key: 'alerts', label: 'Notifications', short: 'Alerts', primary: true, segment: 'alerts', icon: 'bell' },
+  { key: 'messages', label: 'Messages', short: 'Chat', primary: true, segment: 'messages', icon: 'message-circle' },
   { key: 'settings', label: 'Settings', short: 'Settings', primary: true, segment: 'settings', icon: 'settings' },
 ];
 
@@ -34,6 +35,7 @@ export const ADMIN_MANAGEMENT = [
   { id: 'students', title: 'Students', subtitle: 'Edit and activate accounts', icon: 'users' as IconName, route: '/(admin)/students' },
   { id: 'guards', title: 'Guards', subtitle: 'Edit and activate accounts', icon: 'shield' as IconName, route: '/(admin)/guards' },
   { id: 'passes', title: 'Visitor Passes', subtitle: 'Issue and review passes', icon: 'credit-card' as IconName, route: '/(admin)/passes' },
+  { id: 'messages', title: 'Messages', subtitle: 'Chat with campus staff', icon: 'message-circle' as IconName, route: '/(admin)/messages' },
 ] as const;
 
 export const ADMIN_SETTINGS_ROWS = [
@@ -69,8 +71,8 @@ export const TONE_STYLES: Record<Tone, { pill: string; text: string }> = {
 
 // entry_logs: a denied scan is "denied" whatever its action; granted scans show entry / exit
 export const LOG_STATUS: Record<string, { label: string; tone: Tone }> = {
-  entry: { label: 'Entry', tone: 'ok' },
-  exit: { label: 'Exit', tone: 'neutral' },
+  entry: { label: 'Time In', tone: 'ok' },
+  exit: { label: 'Time Out', tone: 'neutral' },
   denied: { label: 'Denied', tone: 'bad' },
 };
 

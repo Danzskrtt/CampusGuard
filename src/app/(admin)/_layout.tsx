@@ -1,7 +1,9 @@
 import AdminSidebar from '@/features/admin/components/AdminSidebar';
 import MobileTabBar from '@/features/admin/components/MobileTabBar';
 import { useAdminGuard } from '@/hooks/useAdminGuard';
+import { useAvatarUrls } from '@/hooks/useAvatarUrls';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { Redirect, Slot } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,10 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function AdminLayout() {
   const { isTablet } = useResponsive();
   const { loading, profile } = useAdminGuard();
+  const { urls: avatarUrls } = useAvatarUrls([profile?.avatar_path]);
+  const badges = useNavigationBadges(profile?.role ?? null);
   if (loading) return <View style={styles.loading}><ActivityIndicator color="#1B2A4A" /></View>;
   if (!profile) return <Redirect href="/login" />;
 
-  const sidebar = <AdminSidebar name={profile.full_name} />;
+  const sidebar = <AdminSidebar name={profile.full_name} avatarUri={profile.avatar_path ? avatarUrls[profile.avatar_path] : null} badges={badges} />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -20,7 +24,7 @@ export default function AdminLayout() {
         {isTablet && <View style={styles.sidebar}>{sidebar}</View>}
         <View style={styles.content}><Slot /></View>
       </View>
-      {!isTablet && <MobileTabBar />}
+      {!isTablet && <MobileTabBar badges={badges} />}
     </SafeAreaView>
   );
 }

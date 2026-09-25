@@ -1,4 +1,5 @@
 import { RequestStatus, VisitorDraft, VisitorRequest } from '@/features/student/types';
+import { emitPushNotification } from '@/lib/pushNotifications';
 import { supabase } from '@/supabase';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -100,6 +101,15 @@ export function RequestsProvider({ children }: { children: React.ReactNode }) {
       if (error.code === '42501') throw new Error('Only admins can issue visitor passes.');
       throw error;
     }
+    await Promise.all(rows.map((row) => emitPushNotification({
+      type: 'INSERT',
+      table: 'visitor_requests',
+      schema: 'public',
+      record: row,
+      old_record: null,
+    }).catch((error: unknown) => {
+      console.warn('[Push notifications] Request notification failed:', error);
+    })));
     await loadRequests();
   }, [loadRequests]);
 

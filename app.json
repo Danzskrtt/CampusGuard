@@ -9,15 +9,20 @@
     "backgroundColor": "#F4F4F4",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.campusguard.app",
       "icon": "./assets/expo.icon",
       "backgroundColor": "#F4F4F4"
     },
     "android": {
+      "package": "com.campusguard.app",
       "backgroundColor": "#F4F4F4",
       "adaptiveIcon": {
         "backgroundColor": "#F4F4F4"
       },
-      "predictiveBackGestureEnabled": false
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "output": "static",
@@ -26,6 +31,19 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "default",
+          "sounds": [
+            "./assets/sounds/studentpassapproved.wav",
+            "./assets/sounds/studentpassrejected.wav",
+            "./assets/sounds/alertandnotifstudentadmin.mp3",
+            "./assets/sounds/messagesnotifsound.mp3",
+            "./assets/sounds/pendingapprovaladmin.mp3"
+          ]
+        }
+      ],
       "@react-native-community/datetimepicker",
       [
         "expo-image-picker",
@@ -33,11 +51,27 @@
           "photosPermission": "Allow CampusGuard to choose profile photos.",
           "cameraPermission": "Allow CampusGuard to take profile photos."
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow CampusGuard to use the camera to scan visitor QR passes.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8257500b-7cad-4a3d-b098-69213254fdf5"
+      }
+    },
+    "owner": "danzskrtts-team"
   }
 }

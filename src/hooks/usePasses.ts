@@ -1,17 +1,17 @@
-import { supabase } from '@/supabase';
 import { PAGE_SIZE, T } from '@/constants/admin';
-import { unwrap, useAsync } from '@/hooks/useAsync';
 import type { PassInput } from '@/features/admin/components/PassForm';
+import { unwrap, useAsync } from '@/hooks/useAsync';
+import { supabase } from '@/supabase';
 import { generatePassId, generateQrToken } from '@/utils/pass';
 
 export type Pass = {
-  id: string; visitor_name: string; visitor_type: string; company: string | null; host_name: string | null;
+  id: string; visitor_name: string; visitor_email: string; visitor_type: string; company: string | null; host_name: string | null;
   visit_date: string; valid_until: string | null; time_window: string; purpose: string; status: string; pass_id: string; qr_token: string;
 };
 
 export function usePasses() {
   const q = useAsync(async () => unwrap<Pass[]>(await supabase.from(T.requests)
-    .select('id, visitor_name, visitor_type, company, host_name, visit_date, valid_until, time_window, purpose, status, pass_id, qr_token')
+    .select('id, visitor_name, visitor_email, visitor_type, company, host_name, visit_date, valid_until, time_window, purpose, status, pass_id, qr_token')
     .eq('source', 'admin').order('created_at', { ascending: false }).limit(PAGE_SIZE)), []);
 
   // The database trigger approves admin-issued passes and stamps issued_by.

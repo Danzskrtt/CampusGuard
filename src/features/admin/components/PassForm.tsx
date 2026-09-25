@@ -1,13 +1,13 @@
+import { VISITOR_TYPES } from '@/constants/admin';
+import { DateField, TextField as MobileTextField, SelectField } from '@/features/student/components/FormFields';
+import { PURPOSES, TIME_WINDOWS } from '@/features/student/data/options';
+import { isoDay } from '@/utils/dates';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Chips from './Chips';
-import { VISITOR_TYPES } from '@/constants/admin';
-import { DateField, SelectField, TextField as MobileTextField } from '@/features/student/components/FormFields';
-import { PURPOSES, TIME_WINDOWS } from '@/features/student/data/options';
-import { isoDay } from '@/utils/dates';
 
-export type PassInput = { visitor_name: string; visitor_type: string; company: string; host_name: string; visit_date: string; valid_until: string; time_window: string; purpose: string };
-const empty = (): PassInput => ({ visitor_name: '', visitor_type: VISITOR_TYPES[0], company: '', host_name: '', visit_date: isoDay(new Date()), valid_until: '', time_window: '', purpose: '' });
+export type PassInput = { visitor_name: string; visitor_email: string; visitor_type: string; company: string; host_name: string; visit_date: string; valid_until: string; time_window: string; purpose: string };
+const empty = (): PassInput => ({ visitor_name: '', visitor_email: '', visitor_type: VISITOR_TYPES[0], company: '', host_name: '', visit_date: isoDay(new Date()), valid_until: '', time_window: '', purpose: '' });
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const types = VISITOR_TYPES.map((t) => ({ key: t, label: t[0].toUpperCase() + t.slice(1) }));
 
@@ -18,7 +18,8 @@ export default function PassForm({ onSubmit }: { onSubmit: (v: PassInput) => Pro
   const set = (k: keyof PassInput) => (t: string) => setV((p) => ({ ...p, [k]: t }));
 
   const submit = async () => {
-    if (!v.visitor_name.trim() || !v.time_window.trim() || !v.purpose.trim()) return setErr('Visitor name, time window and purpose are required.');
+    if (!v.visitor_name.trim() || !v.visitor_email.trim() || !v.time_window.trim() || !v.purpose.trim()) return setErr('Visitor name, email, time window and purpose are required.');
+    if (!/^\S+@\S+\.\S+$/.test(v.visitor_email.trim())) return setErr('Enter a valid visitor email address.');
     if (!ISO.test(v.visit_date) || (v.valid_until && !ISO.test(v.valid_until))) return setErr('Use the date format YYYY-MM-DD.');
     if (v.valid_until && v.valid_until < v.visit_date) return setErr('Valid until must be on or after the visit date.');
     setBusy(true);
@@ -30,6 +31,7 @@ export default function PassForm({ onSubmit }: { onSubmit: (v: PassInput) => Pro
   return (
     <View className="gap-3 rounded-2xl border border-line bg-white p-4">
       <MobileTextField label="Visitor name" value={v.visitor_name} onChangeText={set('visitor_name')} autoCapitalize="words" />
+      <MobileTextField label="Visitor email" value={v.visitor_email} onChangeText={set('visitor_email')} autoCapitalize="none" keyboardType="email-address" />
       <Chips options={types} value={v.visitor_type} onChange={set('visitor_type')} />
       <MobileTextField label="Company (optional)" value={v.company} onChangeText={set('company')} />
       <MobileTextField label="Person or office being visited" value={v.host_name} onChangeText={set('host_name')} />

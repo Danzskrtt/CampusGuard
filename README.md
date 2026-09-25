@@ -13,8 +13,10 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 2. Start the app
 
    ```bash
-   npx expo start
+   npm start
    ```
+
+Scan the QR code with the iPhone Camera app or from Expo Go. The default command targets Expo Go over the local network. If the phones are not on the same Wi-Fi or the QR does not open, use `npm run start:go:tunnel` instead.
 
 In the output, you'll find options to open the app in a
 
@@ -24,6 +26,32 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Test notifications on devices
+
+Expo Go cannot provide Android remote push notifications or full media-library access. Use a development build instead:
+
+```bash
+npx expo install expo-dev-client
+npx eas build --platform android --profile development
+# Use --platform ios for iPhone builds, or --platform all for both platforms.
+```
+
+Install the generated build on each device, then run:
+
+```bash
+npm run start:dev-client
+```
+
+Each signed-in device registers its own Expo push token. The app stores all tokens for a user and sends notifications to every registered device. EAS may ask you to link this project to an Expo account the first time you build it.
+
+Before testing push notifications, set the EAS project ID in `.env`:
+
+```bash
+EXPO_PUBLIC_EAS_PROJECT_ID=your-eas-project-id
+```
+
+Find the value in the Expo project dashboard or after running `npx eas init`. Restart Expo after changing `.env`.
 
 ## Get a fresh project
 

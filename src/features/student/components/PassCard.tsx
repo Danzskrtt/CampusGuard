@@ -1,14 +1,15 @@
-import { Feather } from '@expo/vector-icons';
 import { SEPARATOR } from '@/constants/ui';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 import { getShortName, useCurrentUser } from '@/features/student/data/currentUser';
 import { colors } from '@/features/student/theme';
 import { VisitorRequest } from '@/features/student/types';
 import { formatLongDate } from '@/features/student/utils/date';
 import { passQrValue } from '@/features/student/utils/pass';
+import { Feather } from '@expo/vector-icons';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 const SLRC_LOGO = require('../../../../assets/images/slrc-logo.png');
+const SLRC_LOGO_URI = typeof Image.resolveAssetSource === 'function' ? Image.resolveAssetSource(SLRC_LOGO).uri : null;
 
 export default function PassCard({ request }: { request: VisitorRequest }) {
   const currentUser = useCurrentUser();
@@ -16,7 +17,7 @@ export default function PassCard({ request }: { request: VisitorRequest }) {
   return (
     <View style={styles.card}>
       <View style={styles.schoolRow}>
-        <Image source={SLRC_LOGO} style={styles.logo} resizeMode="contain" />
+        <Image source={SLRC_LOGO_URI ? { uri: SLRC_LOGO_URI } : SLRC_LOGO} style={styles.logo} resizeMode="contain" />
         <Text style={styles.school}>SAN LORENZO RUIZ COLLEGE OF ORMOC</Text>
       </View>
       <View style={styles.divider} />
@@ -31,7 +32,7 @@ export default function PassCard({ request }: { request: VisitorRequest }) {
           value={passQrValue(request)}
           size={168}
           ecl="H"
-          logo={SLRC_LOGO}
+          logo={SLRC_LOGO_URI ?? SLRC_LOGO}
           logoSize={34}
           logoBackgroundColor={colors.white}
           logoMargin={2}

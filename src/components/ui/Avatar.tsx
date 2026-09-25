@@ -21,19 +21,28 @@ function colorIndex(name: string) {
 
 function AvatarImage({ uri, pixels, fallback }: { uri: string; pixels: number; fallback: React.ReactNode }) {
   const [failed, setFailed] = useState(false);
-  const [loading, setLoading] = useState(Boolean(uri));
-  const content = !failed ? (
-    <Image
-      source={{ uri }}
-      cachePolicy="memory-disk"
-      contentFit="cover"
-      onError={() => setFailed(true)}
-      onLoad={() => setLoading(false)}
-      style={{ borderRadius: pixels / 2, height: pixels, width: pixels }}
-    />
-  ) : fallback;
+  const [loading, setLoading] = useState(true);
 
-  return loading ? fallback : content;
+  if (failed) return <>{fallback}</>;
+
+  // The image is always mounted so it can load; the fallback sits on top until onLoad fires.
+  return (
+    <View style={{ height: pixels, width: pixels }}>
+      <Image
+        source={{ uri }}
+        cachePolicy="memory-disk"
+        contentFit="cover"
+        onError={() => setFailed(true)}
+        onLoad={() => setLoading(false)}
+        style={{ borderRadius: pixels / 2, height: pixels, width: pixels }}
+      />
+      {loading ? (
+        <View style={[StyleSheet.absoluteFill, styles.nonInteractive]}>
+          {fallback}
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 export default function Avatar({ uri, name, size, onPress }: Props) {
@@ -46,7 +55,13 @@ export default function Avatar({ uri, name, size, onPress }: Props) {
   );
 
   return (
-    <Pressable disabled={!onPress} onPress={onPress} accessibilityRole={onPress ? 'button' : undefined} accessibilityLabel={AVATAR_COPY.profilePhoto(name)} style={{ borderRadius: pixels / 2 }}>
+    <Pressable
+      disabled={!onPress}
+      onPress={onPress}
+      accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityLabel={AVATAR_COPY.profilePhoto(name)}
+      style={{ borderRadius: pixels / 2 }}
+    >
       {uri ? <AvatarImage key={uri} fallback={fallback} pixels={pixels} uri={uri} /> : fallback}
     </Pressable>
   );
@@ -55,4 +70,5 @@ export default function Avatar({ uri, name, size, onPress }: Props) {
 const styles = StyleSheet.create({
   fallback: { alignItems: 'center', borderRadius: 999, justifyContent: 'center' },
   initials: { fontWeight: '800' },
+  nonInteractive: { pointerEvents: 'none' },
 });

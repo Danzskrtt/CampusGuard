@@ -1,0 +1,181 @@
+import type { Feather } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+
+export type GuardIcon = ComponentProps<typeof Feather>['name'];
+export type GuardTone = 'neutral' | 'valid' | 'invalid' | 'expired';
+
+export const GUARD_DB = {
+  profiles: 'profiles',
+  logs: 'entry_logs',
+  shifts: 'guard_shifts',
+  settings: 'user_settings',
+} as const;
+
+export const GUARD_RPC = {
+  dashboard: 'get_dashboard_summary',
+  visitorLog: 'get_visitor_log',
+  scan: 'scan_pass',
+} as const;
+
+export const GUARD_THEME = {
+  navy: '#1B2A4A',
+  dark: '#070D1B',
+  surface: '#FFFFFF',
+  background: '#F4F6FA',
+  mutedSurface: '#EEF2F6',
+  border: '#DCE3EC',
+  text: '#101828',
+  mutedText: '#667085',
+  slate: '#98A2B3',
+  amber: '#F5A400',
+  amberSoft: '#FFF4D6',
+  green: '#16A34A',
+  greenSoft: '#DCFCE7',
+  red: '#DC2626',
+  redSoft: '#FEE2E2',
+  white: '#FFFFFF',
+  overlay: 'rgba(7,13,27,0.62)',
+  hairline: '#E5E7EB',
+  radiusSmall: 8,
+  radiusMedium: 12,
+  radiusLarge: 16,
+  radiusPill: 999,
+  spacingXs: 4,
+  spacingSm: 8,
+  spacingMd: 12,
+  spacingLg: 16,
+  spacingXl: 24,
+  touchTarget: 44,
+  tabBarHeight: 64,
+  scanRatio: 0.72,
+  scanMaxSize: 320,
+  modalMaxWidth: 360,
+  buttonHeight: 46,
+  iconSize: 20,
+  smallIconSize: 16,
+  pageSize: 25,
+  searchDebounceMs: 300,
+  scanCooldownMs: 1500,
+  scanTimeoutMs: 10000,
+  scanResultDelayMs: 500,
+  weekStartsOn: 1,
+  scanLineDurationMs: 1400,
+} as const;
+
+export const GUARD_COPY = {
+  home: 'Home',
+  scanner: 'Scanner',
+  log: 'Log',
+  settings: 'Settings',
+  dashboardTitle: 'Guard Dashboard',
+  scannerTitle: 'Scan Visitor QR Pass',
+  scanningTitle: 'Scanning...',
+  logTitle: 'Visitor Log',
+  settingsTitle: 'Settings',
+  scanCaption: 'Position QR code within frame',
+  scanningCaption: 'Scanning...',
+  allowCamera: 'Allow camera',
+  openSettings: 'Open settings',
+  cameraTitle: 'Camera access required',
+  cameraReason: 'Camera access lets you verify visitor entry passes on campus.',
+  checkingCamera: 'Checking camera permission...',
+  cameraUnavailable: 'Camera permission is unavailable.',
+  torchOn: 'Turn flashlight off',
+  torchOff: 'Turn flashlight on',
+  totalScanned: 'Total Scanned',
+  valid: 'Valid',
+  invalid: 'Invalid',
+  scanQr: 'Scan QR Code',
+  recentActivity: 'Recent Activity',
+  viewLog: 'View Log',
+  noScans: 'No scans yet.',
+  retry: 'Close',
+  noVisitors: 'No visitors found.',
+  searchVisitors: 'Search visitors or host...',
+  export: 'Export visitor log',
+  nothingToExport: 'There is nothing to export.',
+  exportFailed: 'Could not export the visitor log.',
+  scanUnavailable: 'Scanner verification is not available until the server contract is configured.',
+  scanNetworkError: 'We could not verify this pass. Try again.',
+  noActiveShift: 'No active guard shift was found. The scan will be recorded without a shift.',
+  accessGranted: 'Access Granted',
+  accessDenied: 'Access Denied',
+  activePass: 'Visitor entry pass is verified and active',
+  allowEntry: 'Allow Entry',
+  denyEntry: 'Deny Entry',
+  contactAdmin: 'Contact Admin',
+  unregistered: 'Unregistered code',
+  visitorName: 'Visitor Name',
+  invitedBy: 'Invited By',
+  purpose: 'Purpose',
+  passId: 'Pass ID',
+  validUntil: 'Valid Until',
+  status: 'Status',
+  expiration: 'Expiration',
+  host: 'Host',
+  settingsProfile: 'Profile',
+  badgeId: 'Guard ID',
+  guardRole: 'Campus Security Guard',
+  notifications: 'Notifications',
+  shiftSchedule: 'Shift Schedule',
+  darkMode: 'Dark Mode',
+  logout: 'Log Out',
+  logoutTitle: 'Log out?',
+  logoutMessage: 'Your guard session will end on this device.',
+  cancel: 'Cancel',
+  confirm: 'Log out',
+  settingsUnavailable: 'Settings could not be loaded.',
+  schemaUnavailable: 'Guard data is not configured on this server yet.',
+  today: 'Today',
+  thisWeek: 'This Week',
+  thisMonth: 'This Month',
+  inTime: 'In',
+  outTime: 'Out',
+  attempted: 'Attempted',
+  placeholderTime: '--:--',
+  hostPrefix: 'Host',
+  unregisteredCode: 'Unregistered Code',
+  verified: 'Verified',
+  denied: 'Denied',
+  exportVisitor: 'Visitor',
+  exportPassId: 'Pass ID',
+  exportResult: 'Result',
+  exportScannedAt: 'Scanned At',
+  timeIn: 'Time In',
+  timeOut: 'Time Out',
+} as const;
+
+export const GUARD_STORAGE_KEYS = { notifications: 'guard.notifications', darkMode: 'guard.dark-mode' } as const;
+export const GUARD_BARCODE_TYPES = ['qr'] as const;
+
+export const GUARD_TABS = [
+  { key: 'index', label: GUARD_COPY.home, icon: 'home' as GuardIcon },
+  { key: 'scanner', label: GUARD_COPY.scanner, icon: 'maximize' as GuardIcon },
+  { key: 'log', label: GUARD_COPY.log, icon: 'list' as GuardIcon },
+  { key: 'messages', label: 'Messages', icon: 'message-circle' as GuardIcon },
+  { key: 'settings', label: GUARD_COPY.settings, icon: 'settings' as GuardIcon },
+] as const;
+
+export const GUARD_SEGMENTS = [
+  { key: 'today', label: GUARD_COPY.today, days: 1 },
+  { key: 'week', label: GUARD_COPY.thisWeek, days: 7 },
+  { key: 'month', label: GUARD_COPY.thisMonth, days: 30 },
+] as const;
+
+export const GUARD_STATUS = {
+  granted: { label: 'Verified', tone: 'valid' as GuardTone },
+  denied: { label: 'Denied', tone: 'invalid' as GuardTone },
+  expired: { label: 'Expired', tone: 'expired' as GuardTone },
+} as const;
+
+export const GUARD_ACTION_LABELS = {
+  entry: GUARD_COPY.timeIn,
+  exit: GUARD_COPY.timeOut,
+} as const;
+
+export const GUARD_TONE_COLORS: Record<GuardTone, { background: string; text: string }> = {
+  neutral: { background: GUARD_THEME.mutedSurface, text: GUARD_THEME.mutedText },
+  valid: { background: GUARD_THEME.greenSoft, text: GUARD_THEME.green },
+  invalid: { background: GUARD_THEME.redSoft, text: GUARD_THEME.red },
+  expired: { background: GUARD_THEME.amberSoft, text: '#B54708' },
+};

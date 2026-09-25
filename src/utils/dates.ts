@@ -11,6 +11,12 @@ export const fmtTime = (hhmm: string) => {
   const [h, m] = hhmm.split(':').map(Number);
   return new Date(2000, 0, 1, h, m).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 };
+export const isPassExpired = (visitDate: string, validUntil: string | null) => {
+  const expiryDate = validUntil || visitDate;
+  const [year, month, day] = expiryDate.split('-').map(Number);
+  if (!year || !month || !day) return false;
+  return Date.now() >= new Date(year, month - 1, day + 1).getTime();
+};
 const timeParts = (value: string) => {
   const match = value.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
   if (!match) return { hour: 0, minute: 0 };

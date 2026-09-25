@@ -1,9 +1,19 @@
-import * as MediaLibrary from 'expo-media-library';
+import { passSummary } from '@/features/student/utils/pass.shared';
+import * as MediaLibrary from 'expo-media-library/legacy';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
-import { Alert } from 'react-native';
+import { Alert, Share } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
-export { emailPass, generatePassId, passQrValue, sharePass } from '@/features/student/utils/pass.shared';
+export { emailPass, generatePassId, passQrValue } from '@/features/student/utils/pass.shared';
+
+export async function sharePass(request: Parameters<typeof passSummary>[0], ref?: RefObject<View | null>) {
+  try {
+    const url = ref ? await captureRef(ref, { format: 'png', quality: 1 }) : undefined;
+    await Share.share({ message: passSummary(request), ...(url ? { url } : {}) });
+  } catch {
+    Alert.alert('Could not share', 'Something went wrong while sharing the pass.');
+  }
+}
 
 export async function savePassToPhotos(ref: RefObject<View | null>) {
   try {

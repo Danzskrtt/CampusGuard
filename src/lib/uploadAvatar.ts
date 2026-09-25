@@ -1,4 +1,4 @@
-import { AVATAR_BUCKET, AVATAR_COPY, AVATAR_EXPIRY_SECONDS, AVATAR_JPEG_QUALITY, AVATAR_MAX_BYTES, AVATAR_SIZE } from '@/constants/avatar';
+import { AVATAR_BUCKET, AVATAR_COPY, AVATAR_JPEG_QUALITY, AVATAR_MAX_BYTES, AVATAR_SIZE } from '@/constants/avatar';
 import { supabase } from '@/supabase';
 import { decode } from 'base64-arraybuffer';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -33,7 +33,7 @@ export async function pickAvatar(source: AvatarSource): Promise<string | null> {
   return asset.uri;
 }
 
-export async function uploadAvatar(uri: string, profileId: string): Promise<string> {
+export async function uploadAvatar(uri: string, profileId: string, folder = 'students'): Promise<string> {
   try {
     const processed = await ImageManipulator.manipulateAsync(
       uri,
@@ -41,11 +41,14 @@ export async function uploadAvatar(uri: string, profileId: string): Promise<stri
       { compress: AVATAR_JPEG_QUALITY, format: ImageManipulator.SaveFormat.JPEG, base64: true },
     );
     if (!processed.base64) throw new Error('missing image data');
-    const path = `students/${profileId}/${Date.now()}.jpg`;
-    const { error } = await supabase.storage.from(AVATAR_BUCKET).upload(path, decode(processed.base64), { contentType: 'image/jpeg', upsert: false });
+    const path = `${folder}/${profileId}/${Date.now()}.jpg`;
+    const { error } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .upload(path, decode(processed.base64), { contentType: 'image/jpeg', upsert: false });
     if (error) throw error;
     return path;
-  } catch {
+  } catch (e) {
+    console.warn('uploadAvatar failed:', e);
     throw new Error(AVATAR_COPY.uploadFailed);
   }
 }

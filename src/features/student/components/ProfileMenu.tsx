@@ -10,9 +10,10 @@ interface Props {
   studentId: string;
   onClose: () => void;
   onLogout?: () => void;
+  onPasswordChange?: () => void;
 }
 
-export default function ProfileMenu({ visible, name, studentId, onClose, onLogout }: Props) {
+export default function ProfileMenu({ visible, name, studentId, onClose, onLogout, onPasswordChange }: Props) {
   const insets = useSafeAreaInsets();
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose} statusBarTranslucent>
@@ -23,6 +24,16 @@ export default function ProfileMenu({ visible, name, studentId, onClose, onLogou
           <Text style={styles.id}>Student ID: {studentId}</Text>
         </View>
         <View style={styles.divider} />
+        <Pressable
+          style={styles.menuRow}
+          onPress={() => {
+            onClose();
+            onPasswordChange?.();
+          }}
+        >
+          <Feather name="key" size={13} color={colors.navy} />
+          <Text style={styles.menuText}>Change password</Text>
+        </Pressable>
         <Pressable
           style={styles.logoutRow}
           onPress={() => {
@@ -53,6 +64,8 @@ const styles = StyleSheet.create({
   name: { fontSize: 12, fontWeight: '600', color: colors.textPrimary },
   id: { fontSize: 10, color: colors.textSecondary, marginTop: 2 },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
+  menuRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10 },
+  menuText: { fontSize: 12, color: colors.textPrimary, marginLeft: 8, fontWeight: '500' },
   logoutRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10 },
   logoutText: { fontSize: 12, color: colors.danger, marginLeft: 8, fontWeight: '500' },
 });

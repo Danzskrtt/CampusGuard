@@ -2,10 +2,12 @@ import PersonEditor from '@/features/admin/components/PersonEditor';
 import PersonRow from '@/features/admin/components/PersonRow';
 import ScreenShell from '@/features/admin/components/ScreenShell';
 import { ICON_COLORS, STUDENT_MANAGEMENT_COPY } from '@/constants/admin';
+import PasswordChangeModal from '@/components/PasswordChangeModal';
 import { useDebounced } from '@/hooks/useAsync';
 import type { Person } from '@/hooks/useProfiles';
 import { useStudents } from '@/hooks/useProfiles';
 import { useAvatarUrls } from '@/hooks/useAvatarUrls';
+import { setTemporaryPasswordsForRole } from '@/lib/passwordManagement';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Alert, Pressable, Text, TextInput, View } from 'react-native';
@@ -16,10 +18,18 @@ export default function Students() {
   const { urls: avatarUrls } = useAvatarUrls((data ?? []).map((student) => student.avatar_path));
   const [editing, setEditing] = useState<Person | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const confirmDelete = (person: Person) => Alert.alert('Delete student?', `Remove ${person.full_name} from the profile directory?`, [{ text: 'Cancel', style: 'cancel' }, { text: 'Delete', style: 'destructive', onPress: () => remove(person.id).catch((e: Error) => Alert.alert('Could not delete', e.message)) }]);
+  const bulkSetPasswords = async (password: string) => {
+    const result = await setTemporaryPasswordsForRole('student', password);
+    Alert.alert('Bulk password reset', `Updated ${result?.updated ?? 0} active student account${(result?.updated ?? 0) === 1 ? '' : 's'} to the new temporary password.`);
+  };
   return (
     <ScreenShell title="Student Directory" subtitle="Add, edit, activate or remove student accounts" loading={loading} error={error} onRefresh={refresh}
-      right={<Pressable onPress={() => { setEditing(null); setEditorOpen(true); }} style={{ backgroundColor: '#1B2A4A' }} className="rounded-xl px-3.5 py-2.5"><Text className="text-xs font-bold text-white">Add student</Text></Pressable>}>
+      right={<View className="flex-row items-center gap-2">
+        <Pressable onPress={() => setPasswordModalOpen(true)} style={{ backgroundColor: '#E2E8F0' }} className="rounded-xl px-3.5 py-2.5"><Text className="text-xs font-bold text-slate-800">Set all passwords</Text></Pressable>
+        <Pressable onPress={() => { setEditing(null); setEditorOpen(true); }} style={{ backgroundColor: '#1B2A4A' }} className="rounded-xl px-3.5 py-2.5"><Text className="text-xs font-bold text-white">Add student</Text></Pressable>
+      </View>}>
       <View className="relative">
         <Text className="text-xs font-semibold text-muted">{STUDENT_MANAGEMENT_COPY.search}</Text>
         <View className="relative mt-1.5">
@@ -52,6 +62,7 @@ export default function Students() {
       </View>
       {data && !data.length ? <Text className="py-10 text-center text-sm text-muted">{STUDENT_MANAGEMENT_COPY.noMatch}</Text> : null}
       <PersonEditor person={editing} avatarUri={editing ? avatarUrls[editing.avatar_path ?? ''] : null} kind="student" open={editorOpen || !!editing} onClose={() => { setEditing(null); setEditorOpen(false); }} onSave={(changes) => edit(editing?.id ?? '', changes)} onCreate={({ changes, password, avatarUri }) => add(changes, password, avatarUri)} />
+      <PasswordChangeModal visible={passwordModalOpen} title="Reset student temporary passwords" subtitle="This updates the current password for all active student accounts." submitLabel="Set all passwords" onClose={() => setPasswordModalOpen(false)} onSubmit={bulkSetPasswords} />
     </ScreenShell>
   );
 }

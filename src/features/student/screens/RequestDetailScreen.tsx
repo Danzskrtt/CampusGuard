@@ -121,12 +121,13 @@ export default function RequestDetailScreen({ navigation, route }: Props) {
               variant="danger"
               icon={(c) => <Feather name="x" size={15} color={c} />}
               onPress={() => setConfirmVisible(true)}
+              style={styles.footerButton}
             />
             <AppButton
               title="Edit Request"
               icon={(c) => <Feather name="edit" size={15} color={c} />}
               onPress={() => navigation.navigate('NewRequest', { editId: request.id })}
-              style={styles.footerGap}
+              style={styles.footerButton}
             />
           </>
         )}
@@ -148,7 +149,7 @@ export default function RequestDetailScreen({ navigation, route }: Props) {
 
       {/* Off-screen copy of the pass so "Save QR to Photos" can capture it without leaving this screen */}
       {request.status === 'approved' && (
-        <View style={[styles.offscreen, { pointerEvents: 'none' }]}>
+        <View style={[styles.offscreen, styles.nonInteractive]}>
           <View ref={passRef} collapsable={false}>
             <PassCard request={request} />
           </View>
@@ -207,9 +208,10 @@ const styles = StyleSheet.create({
   declinedHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   declinedTitle: { fontSize: 11, fontWeight: '700', color: statusColors.rejected.text, marginLeft: 5 },
   declinedText: { fontSize: 10, color: colors.textPrimary, lineHeight: 15 },
-  footer: { padding: 16 },
-  footerGap: { marginTop: 10 },
+  footer: { padding: 16, gap: 12 },
+  footerButton: { width: '100%' },
   offscreen: { position: 'absolute', left: -2000, top: 0, width: 320 },
+  nonInteractive: { pointerEvents: 'none' },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   emptyTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' },
   emptyText: { color: colors.textSecondary, fontSize: 12, marginTop: 8, textAlign: 'center' },

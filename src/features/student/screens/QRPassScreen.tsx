@@ -1,13 +1,18 @@
-import React, { useEffect, useRef } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { Feather } from '@expo/vector-icons';
 import AppButton from '@/features/student/components/AppButton';
 import PassCard from '@/features/student/components/PassCard';
 import { useRequests } from '@/features/student/context/RequestsContext';
 import { colors } from '@/features/student/theme';
 import { savePassToPhotos, sharePass } from '@/features/student/utils/pass';
+import { Feather } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useRef } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+// Move these into your theme file when convenient.
+const SCREEN_PADDING_X = 24; // same value as body, so buttons line up with the pass card
+const FOOTER_GAP = 12;
+const FOOTER_MAX_WIDTH = 520; // keeps the buttons tidy on iPad
 
 type Props = {
   navigation: { navigate: (name: string, params?: any) => void; goBack: () => void };
@@ -18,12 +23,17 @@ export default function QRPassScreen({ navigation, route }: Props) {
   const { requests } = useRequests();
   const request = requests.find((r) => r.id === route?.params?.requestId);
   const passRef = useRef<View>(null);
+  const { width: windowWidth } = useWindowDimensions();
 
   useEffect(() => {
     if (!request) navigation.goBack();
   }, [request, navigation]);
 
   if (!request) return null;
+
+  // Explicit, equal widths set on plain wrapper Views, so they don't depend on AppButton, flex or `gap`.
+  const footerWidth = Math.min(windowWidth, FOOTER_MAX_WIDTH);
+  const buttonWidth = Math.floor((footerWidth - SCREEN_PADDING_X * 2 - FOOTER_GAP) / 2);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -42,22 +52,25 @@ export default function QRPassScreen({ navigation, route }: Props) {
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <AppButton
-          title="Share Pass"
-          variant="ghostDark"
-          icon={(c) => <Feather name="share" size={14} color={c} />}
-          onPress={() => sharePass(request)}
-          style={styles.footerButton}
-        />
-        <View style={styles.footerGap} />
-        <AppButton
-          title="Save to Photos"
-          variant="light"
-          icon={(c) => <Feather name="download" size={14} color={c} />}
-          onPress={() => savePassToPhotos(passRef)}
-          style={styles.footerButton}
-        />
+      <View style={[styles.footer, { width: footerWidth }]}>
+        <View style={{ width: buttonWidth }}>
+          <AppButton
+            title="Share Pass"
+            variant="ghostDark"
+            icon={(c) => <Feather name="share" size={20} color={c} />}
+            onPress={() => sharePass(request, passRef)}
+            style={styles.fill}
+          />
+        </View>
+        <View style={{ width: buttonWidth, marginLeft: FOOTER_GAP }}>
+          <AppButton
+            title="Save to Photos"
+            variant="light"
+            icon={(c) => <Feather name="download" size={20} color={c} />}
+            onPress={() => savePassToPhotos(passRef)}
+            style={styles.fill}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -83,9 +96,20 @@ const styles = StyleSheet.create({
   },
   headerSpacer: { width: 28, height: 28 },
   title: { fontSize: 14, fontWeight: '600', color: colors.white },
-  body: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 16 },
+  body: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: SCREEN_PADDING_X,
+    paddingVertical: 16,
+  },
   passWrap: { width: '100%' },
-  footer: { width: '100%', flexDirection: 'row', alignItems: 'center', padding: 16 },
-  footerButton: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0 },
-  footerGap: { width: 10 },
+  fill: { flex: 1 },
+  footer: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    paddingHorizontal: SCREEN_PADDING_X,
+    paddingVertical: 16,
+  },
 });

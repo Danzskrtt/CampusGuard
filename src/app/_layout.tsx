@@ -1,5 +1,6 @@
 import '../global.css';
 
+import PushNotificationRegistrar from '@/components/PushNotificationRegistrar';
 import { ThemeProvider as AppThemeProvider } from '@/context/ThemeContext';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -18,6 +19,7 @@ export default function TabLayout() {
   return (
     <AppThemeProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <PushNotificationRegistrar />
         <Stack screenOptions={{ headerShown: false }} />
       </ThemeProvider>
     </AppThemeProvider>
