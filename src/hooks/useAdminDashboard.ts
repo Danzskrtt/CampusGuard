@@ -12,20 +12,31 @@ type Summary = { pending_requests: number | null; entries_today: number; denied_
 const hasRemovedGateRelation = (error: { message?: string } | null) =>
   !!error?.message?.toLowerCase().includes('public.gates');
 
+async function loadRecentFeedWithoutGate() {
+  const { data, error } = await supabase
+    .from(T.logs)
+    .select('id, scanned_at, visitor_name, pass_id, action, result, deny_reason')
+    .order('scanned_at', { ascending: false })
+    .limit(FEED_SIZE);
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as Omit<FeedItem, 'guard_name'>[]).map((row) => ({ ...row, guard_name: null }));
+}
+
 async function loadWithoutGateRpc() {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const startIso = start.toISOString();
-  const [pending, entries, denied] = await Promise.all([
+  const [pending, entries, denied, feed] = await Promise.all([
     supabase.from(T.requests).select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from(T.logs).select('id', { count: 'exact', head: true }).gte('scanned_at', startIso).eq('result', 'granted'),
     supabase.from(T.logs).select('id', { count: 'exact', head: true }).gte('scanned_at', startIso).eq('result', 'denied'),
+    loadRecentFeedWithoutGate(),
   ]);
   const failed = pending.error ?? entries.error ?? denied.error;
   if (failed) throw new Error(failed.message);
   return {
     stats: { visitorsToday: entries.count ?? 0, pendingApprovals: pending.count ?? 0, activeGuards: 0, deniedToday: denied.count ?? 0 },
-    feed: [] as FeedItem[],
+    feed,
   };
 }
 
@@ -46,7 +57,7 @@ export function useAdminDashboard() {
       try {
         const fallback = await loadWithoutGateRpc();
         setStats({ ...fallback.stats, activeGuards: guards.count ?? 0 });
-        setFeed([]);
+        setFeed(fallback.feed);
         setError(null);
       } catch (fallbackError) {
         setError(fallbackError instanceof Error ? fallbackError.message : 'Could not load dashboard data.');

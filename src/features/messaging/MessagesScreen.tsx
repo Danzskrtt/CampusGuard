@@ -22,17 +22,22 @@ export default function MessagesScreen() {
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const threadRef = useRef<ScrollView | null>(null);
+  const markConversationReadRef = useRef(markConversationRead);
   const selected = data?.contacts.find((contact) => contact.id === selectedId) ?? data?.contacts[0] ?? null;
   const visibleContacts = (data?.contacts ?? []).filter((contact) => {
     const query = contactSearch.trim().toLowerCase();
     return !query || `${contact.full_name} ${contactLabel(contact)}`.toLowerCase().includes(query);
   });
   const thread = selected && data ? data.messages.filter((message) => (message.sender_id === data.userId && message.recipient_id === selected.id) || (message.sender_id === selected.id && message.recipient_id === data.userId)) : [];
+  const selectedContactId = selected?.id;
 
   useEffect(() => {
-    if (selected && selected.id !== selectedId) setSelectedId(selected.id);
-    if (selected) void markConversationRead(selected.id).catch(() => undefined);
-  }, [selected?.id, selectedId]);
+    markConversationReadRef.current = markConversationRead;
+  }, [markConversationRead]);
+
+  useEffect(() => {
+    if (selectedContactId) void markConversationReadRef.current(selectedContactId).catch(() => undefined);
+  }, [selectedContactId]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => threadRef.current?.scrollToEnd({ animated: false }));

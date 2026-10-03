@@ -19,17 +19,18 @@ export function useAvatarUrls(paths: (string | null | undefined)[]) {
   useEffect(() => {
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    const pathsToLoad = key ? key.split('|') : [];
     const load = async () => {
       const now = Date.now();
-      if (!normalized.length) {
+      if (!pathsToLoad.length) {
         setUrls({});
         setLoading(false);
         return;
       }
-      const missing = normalized.filter((path) => !cache.has(path) || cache.get(path)!.expiresAt <= now + AVATAR_REFRESH_BUFFER_MS);
+      const missing = pathsToLoad.filter((path) => !cache.has(path) || cache.get(path)!.expiresAt <= now + AVATAR_REFRESH_BUFFER_MS);
       if (!missing.length) {
-        setUrls(Object.fromEntries(normalized.map((path) => [path, cache.get(path)!.url])));
-        const nextExpiry = Math.min(...normalized.map((path) => cache.get(path)!.expiresAt));
+        setUrls(Object.fromEntries(pathsToLoad.map((path) => [path, cache.get(path)!.url])));
+        const nextExpiry = Math.min(...pathsToLoad.map((path) => cache.get(path)!.expiresAt));
         timer = setTimeout(() => void load(), Math.max(AVATAR_REFRESH_BUFFER_MS, nextExpiry - Date.now() - AVATAR_REFRESH_BUFFER_MS));
         return;
       }
@@ -46,9 +47,9 @@ export function useAvatarUrls(paths: (string | null | undefined)[]) {
         const path = missing[index];
         if (path && item.signedUrl) cache.set(path, { url: item.signedUrl, expiresAt: Date.now() + AVATAR_EXPIRY_SECONDS * 1000 });
       });
-      setUrls(Object.fromEntries(normalized.flatMap((path) => cache.has(path) ? [[path, cache.get(path)!.url]] : [])));
+      setUrls(Object.fromEntries(pathsToLoad.flatMap((path) => cache.has(path) ? [[path, cache.get(path)!.url]] : [])));
       setLoading(false);
-      const nextExpiry = Math.min(...normalized.map((path) => cache.get(path)?.expiresAt ?? Date.now() + AVATAR_EXPIRY_SECONDS * 1000));
+      const nextExpiry = Math.min(...pathsToLoad.map((path) => cache.get(path)?.expiresAt ?? Date.now() + AVATAR_EXPIRY_SECONDS * 1000));
       timer = setTimeout(() => void load(), Math.max(AVATAR_REFRESH_BUFFER_MS, nextExpiry - Date.now() - AVATAR_REFRESH_BUFFER_MS));
     };
     void load();

@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 
 export type MessageContact = { id: string; full_name: string; role: string; phone: string | null; avatar_path: string | null };
 export type DirectMessage = { id: string; sender_id: string; recipient_id: string; body: string; is_read: boolean; created_at: string };
-type MessageData = { userId: string; contacts: MessageContact[]; messages: DirectMessage[] };
 
 export function useMessages() {
   const q = useAsync(async () => {
@@ -22,13 +21,14 @@ export function useMessages() {
     if (messagesResult.error) throw new Error(messagesResult.error.message);
     return { userId: authData.user.id, contacts: (contactsResult.data ?? []) as MessageContact[], messages: (messagesResult.data ?? []) as DirectMessage[] };
   }, []);
+  const { refresh } = q;
 
   useEffect(() => {
     const channel = supabase.channel('direct-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: T.messages }, () => void q.refresh())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: T.messages }, () => void refresh())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [q.refresh]);
+  }, [refresh]);
 
   const sendMessage = async (recipientId: string, body: string) => {
     const text = body.trim();

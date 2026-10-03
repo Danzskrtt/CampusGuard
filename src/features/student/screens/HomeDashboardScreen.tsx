@@ -5,7 +5,7 @@ import ProfileMenu from '@/features/student/components/ProfileMenu';
 import RequestCard from '@/features/student/components/RequestCard';
 import StatCard from '@/features/student/components/StatCard';
 import { useRequests } from '@/features/student/context/RequestsContext';
-import { getInitials, useCurrentUser } from '@/features/student/data/currentUser';
+import { useCurrentUser } from '@/features/student/data/currentUser';
 import { colors } from '@/features/student/theme';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAvatarUrls } from '@/hooks/useAvatarUrls';
@@ -29,7 +29,6 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
   const { data: notifications = [] } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const notificationList = notifications ?? [];
 
   const counts = useMemo(
     () => ({
@@ -41,8 +40,8 @@ export default function HomeDashboardScreen({ navigation, onLogout }: Props) {
   );
 
   const latestAnnouncement = useMemo(
-    () => notificationList.find((n) => n.type === 'announcement' || n.type === 'system') ?? null,
-    [notificationList],
+    () => (notifications ?? []).find((n) => n.type === 'announcement' || n.type === 'system') ?? null,
+    [notifications],
   );
 
   return (

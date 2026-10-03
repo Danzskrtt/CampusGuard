@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 type Props = {
@@ -16,14 +16,13 @@ export default function PasswordChangeModal({ visible, title, subtitle, submitLa
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!visible) {
-      setPassword('');
-      setConfirmPassword('');
-      setError('');
-      setBusy(false);
-    }
-  }, [visible]);
+  const handleClose = () => {
+    setPassword('');
+    setConfirmPassword('');
+    setError('');
+    setBusy(false);
+    onClose();
+  };
 
   const handleSubmit = async () => {
     if (password.length < 8) {
@@ -41,7 +40,7 @@ export default function PasswordChangeModal({ visible, title, subtitle, submitLa
       await onSubmit(password);
       setPassword('');
       setConfirmPassword('');
-      onClose();
+      handleClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not update password.');
     } finally {
@@ -50,7 +49,7 @@ export default function PasswordChangeModal({ visible, title, subtitle, submitLa
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text>
@@ -83,7 +82,7 @@ export default function PasswordChangeModal({ visible, title, subtitle, submitLa
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <View style={styles.actions}>
-            <Pressable onPress={onClose} style={styles.cancelButton}>
+            <Pressable onPress={handleClose} style={styles.cancelButton}>
               <Text style={styles.cancelText}>Cancel</Text>
             </Pressable>
             <Pressable disabled={busy} onPress={() => void handleSubmit()} style={[styles.submitButton, busy && styles.disabled]}>
